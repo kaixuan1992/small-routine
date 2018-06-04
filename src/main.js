@@ -6,6 +6,7 @@ import router from './router'
 // import MuseUI from 'muse-ui';
 // import 'muse-ui/dist/muse-ui.css';
 import MintUI from 'mint-ui'
+import { Toast } from 'mint-ui';
 //字体
 import '../src/assets/font/iconfont.css';
 import 'mint-ui/lib/style.css'
@@ -20,6 +21,14 @@ Vue.filter('TIMEDF', function (value, format) {
 	return 	moment(value).format('YYYY-MM-DD HH:mm:ss')
 
 });
+window.Tip = function (message, time,position) {
+  Toast({
+    message: message,
+    position: position || 'buttom',
+    duration: time
+  });
+
+}
 
 // Vue.use(MuseUI);
 

@@ -1,17 +1,17 @@
 <template>
   <div class="detail-box">
     <div class="detail-head">
-      <div class="left-head">外卖单 ¥94.00</div>
+      <div class="left-head">外卖单 ¥&nbsp {{solidFee}}</div>
       <div class="right-head">已支付</div>
     </div>
     <div class="order-info border1px">
       <div class="person-infor">
-        <div class="person-left"><span>吴笑阔</span><span>先生</span><span> 187987987987</span></div>
+        <div class="person-left"><span>{{name}}</span><span>&nbsp{{gender}}&nbsp</span><span>{{mobile}}</span></div>
         <div class="person-right">
           <span class="iconfont icon-dianhua"></span>
         </div>
       </div>
-      <div class="person-address">杭州EFC落客行政公寓</div>
+      <div class="person-address">{{address}}</div>
     </div>
     <div class="order-detail borderbefore-1px">
       <div class="order-head">
@@ -20,36 +20,44 @@
         <div>单价</div>
         <div>总价</div>
       </div>
-      <div class="order-content" v-for="n in 5">
+      <div class="order-content" v-for="item in distList">
         <div>麻辣小龙虾</div>
-        <div>1</div>
-        <div>39</div>
-        <div>39</div>
+        <div>{{item.dishName}}</div>
+        <div>{{item.count}}</div>
+        <div>{{item.price}}</div>
       </div>
       <div class="border1px splitLine"></div>
       <div class="extra border1px">
         <div class="extra-box">
           <div class="extra-left">包装盒</div>
-          <div class="extra-right">1</div>
+          <div class="extra-right">{{boxFee}}</div>
         </div>
         <div class="extra-box">
-          <div class="extra-left">包装盒</div>
-          <div class="extra-right">1</div>
+          <div class="extra-left">配送费</div>
+          <div class="extra-right">{{sendFee}}</div>
         </div>
       </div>
       <div class="price">
         <div class="price-left"></div>
-        <div class="price-right">¥94</div>
+        <div class="price-right">{{solidFee}}</div>
       </div>
     </div>
     <div class="remarks-wrap borderbefore-1px">
       <div class="remarks-title">备注&nbsp:</div>
-      <div class="remarks-content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容</div>
+      <div class="remarks-content">{{mark}}</div>
     </div>
     <div class="sign-box">
-      <div class="sign-wrap" v-for="n in 3">
+      <div class="sign-wrap">
         <div class="sign-left">流水号</div>
-        <div class="sign-right">11111</div>
+        <div class="sign-right">{{id}}</div>
+      </div>
+      <div class="sign-wrap">
+        <div class="sign-left">订单号</div>
+        <div class="sign-right">{{orderNumber}}</div>
+      </div>
+      <div class="sign-wrap">
+        <div class="sign-left">订单时间</div>
+        <div class="sign-right">{{createTime}}</div>
       </div>
     </div>
     <div class="quit-button" @click="quitMoney">退款</div>
@@ -64,17 +72,21 @@
   export default {
     data() {
       return {
-        scrolldistance: 0,
-        datailcontent: '',
-        newsTitle: '',
-        mediaUrl: '',
-        homeImage: '',
-        createTime: '',
-        stars: '',
-        isadd: false,
-        addnumber: 0,
-        imgshow: true,
-        isdetail: false
+        solidFee: '',
+        solidFe: '',
+        name: '',
+        mobile: '',
+        gender: '',
+        distList:[],
+        boxFee: '',
+        sendFee: '',
+        mark: '',
+        id: '',
+        number: '',
+        payTime: '',
+        createTime:'',
+        businessId:5513
+  
       }
     },
     created() {
@@ -111,35 +123,21 @@
             // debugger
             // let res = JSON.parse(data)
             if (res.code == 1) {
-              // self.homeImage = res.data.homeImage
-              // if (res.data.catId == 1) {
-              // 	self.imgshow = true
-              // 	self.homeImage = res.data.homeImage
-              // } else {
-              // 	self.imgshow = false
-              // 	self.mediaUrl = res.data.mediaUrl
-              // }
-              Indicator.close();
-              self.isdetail = true
-              let date = new Date(res.data.createDate)
-              self.createTime = moment(res.data.createDate).format('YYYY-MM-DD HH:mm:ss')
-              self.newsTitle = res.data.newsTitle
-              self.stars = res.data.stars
-  
-              // console.log(this.createDate)
-              console.log($('#content1'), "res.data.newsHtml")
-              $('#content').html('34343')
-              $('#content').html(res.data.newsHtml)
-              // console.log(res.data.newsHtml, "res.data")
-              // res.data.forEach((item)=>{
-              //     self.dataItem  = item.data;
-              //     console.log(self.dataItem,"self.dataItem")
-              //      console.log(item)
-              //     if(item.headFlag){
-              //         self.topitem = item
-              //     }
-              // })
-              //    console.log("huo")
+              // console.log()
+              self.solidFee = res.data.solidFee
+              self.name = res.data.addressInfo.name
+              self.mobile = res.data.addressInfo.mobile
+              self.address = res.data.addressInfo.address
+              self.distList = res.data.dishs;
+              self.boxFee = res.data.boxFee 
+              self.sendFee = res.data.sendFee
+              self.gender = res.data.gender ? '先生': '小姐'
+              self.mark = res.data.mark
+              self.id = res.data.id
+              self.orderNumber = res.data.number
+              self.payTime = res.data.PayTime
+              self.createTime = res.data.createTime
+              Indicator.close()
             }
           },
           error: function(error) {
@@ -153,21 +151,23 @@
           url: baseUrl + "/boss/orderRefund",
           contentType: "application/x-www-form-urlencoded;charset=utf-8;",
           data: {
-            businessId: parseInt(id),
-            number: number
+            businessId: parseInt(this.businessId),
+            number: this.number
           },
           success: function(res) {
             if (res.code == 1) {
+               Tip('退款失败', 1000, 'top');
               Indicator.close();
+            }else{
+              Tip(res.message, 1000, 'top');
             }
           },
           error: function(error) {
-            console("error=" + error);
+             console.log(error)
           }
         });
       },
       back() {
-        console.log(2222)
         this.$router.back()
         document.body.scrollTop = this.scrolldistance
         document.documentElement.scrollTop = this.scrolldistance
@@ -211,7 +211,7 @@
         height: 0.72rem;
         line-height: 0.72rem;
         .person-left {
-          flex: 4;
+          flex: 9;
         }
         .person-right {
           flex: 1;
@@ -220,6 +220,7 @@
       .person-address {
         height: 0.72rem;
         line-height: 0.72rem;
+        letter-spacing: 2px ;
         // margin:10px;
       }
     }
@@ -318,13 +319,13 @@
         line-height: 0.72rem;
         display: flex;
         .sign-left {
-          flex: 4;
+          flex: 2;
           color: #666666;
           font-weight: bold;
         }
         .sign-right {
-          flex: 1;
-          text-align: center;
+          flex: 4;
+          text-align: right;
         }
       }
     }
