@@ -58,7 +58,7 @@
     /* color: #4499EE; */
     text-decoration: none;
     /*CSS下划线效果：无下划线*/
-    border-bottom: 1px #0099CC dotted/*CSS加一个只有下边的框 边框为虚线 */
+
   }
   
   a:link {

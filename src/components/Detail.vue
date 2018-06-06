@@ -2,29 +2,30 @@
   <div class="detail-box">
     <div class="detail-head">
       <div class="left-head">外卖单 ¥&nbsp {{solidFee}}</div>
-      <div class="right-head">已支付</div>
+      <div class="right-head">{{status}}</div>
     </div>
     <div class="order-info border1px">
       <div class="person-infor">
         <div class="person-left"><span>{{name}}</span><span>&nbsp{{gender}}&nbsp</span><span>{{mobile}}</span></div>
         <div class="person-right">
-          <span class="iconfont icon-dianhua"></span>
+          <a :href='"tel:" + mobile'> <span class="iconfont icon-dianhua"></span></a>
         </div>
       </div>
       <div class="person-address">{{address}}</div>
     </div>
     <div class="order-detail borderbefore-1px">
       <div class="order-head">
-        <div>商品</div>
+        <div class="order-first">商品</div>
         <div>数量</div>
         <div>单价</div>
-        <div>总价</div>
+        <!-- <div>总价</div> -->
       </div>
       <div class="order-content" v-for="item in distList">
-        <div>麻辣小龙虾</div>
-        <div>{{item.dishName}}</div>
+        <!-- <div>麻辣小龙虾</div> -->
+        <div class="order-first">{{item.dishName}}</div>
         <div>{{item.count}}</div>
         <div>{{item.price}}</div>
+          <!-- <div>{{item.price}}</div> -->
       </div>
       <div class="border1px splitLine"></div>
       <div class="extra border1px">
@@ -60,7 +61,7 @@
         <div class="sign-right">{{createTime}}</div>
       </div>
     </div>
-    <div class="quit-button" @click="quitMoney">退款</div>
+    <!-- <div class="quit-button" @click="quitMoney">退款</div> -->
   </div>
 </template>
 
@@ -77,15 +78,18 @@
         name: '',
         mobile: '',
         gender: '',
-        distList:[],
+        distList: [],
         boxFee: '',
         sendFee: '',
         mark: '',
         id: '',
         number: '',
         payTime: '',
-        createTime:'',
-        businessId:5513
+        createTime: '',
+        address: '',
+        status: '',
+        orderNumber: '',
+        businessId: 5513
   
       }
     },
@@ -129,14 +133,26 @@
               self.mobile = res.data.addressInfo.mobile
               self.address = res.data.addressInfo.address
               self.distList = res.data.dishs;
-              self.boxFee = res.data.boxFee 
+              self.boxFee = res.data.boxFee
               self.sendFee = res.data.sendFee
-              self.gender = res.data.gender ? '先生': '小姐'
+              self.gender = res.data.gender ? '先生' : '小姐'
               self.mark = res.data.mark
               self.id = res.data.id
               self.orderNumber = res.data.number
               self.payTime = res.data.PayTime
               self.createTime = res.data.createTime
+              // self.status = res.data.status
+              switch (res.data.status) {
+                case 0:
+                  self.status = '待支付'
+                  break
+                case 1:
+                  self.status = '已支付'
+                  break
+                case 2:
+                  self.status = '已取消'
+                  break
+              }
               Indicator.close()
             }
           },
@@ -156,14 +172,14 @@
           },
           success: function(res) {
             if (res.code == 1) {
-               Tip('退款失败', 1000, 'top');
+              Tip('退款失败', 1000, 'top');
               Indicator.close();
-            }else{
+            } else {
               Tip(res.message, 1000, 'top');
             }
           },
           error: function(error) {
-             console.log(error)
+            console.log(error)
           }
         });
       },
@@ -215,12 +231,24 @@
         }
         .person-right {
           flex: 1;
+          .icon-dianhua {
+            color: #999;
+            position: relative;
+            left: 12px;
+            font-size: 18px;
+          }
+          a {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            // background:red;
+          }
         }
       }
       .person-address {
         height: 0.72rem;
         line-height: 0.72rem;
-        letter-spacing: 2px ;
+        letter-spacing: 2px;
         // margin:10px;
       }
     }
@@ -247,7 +275,7 @@
         line-height: 0.72rem;
         display: flex;
         div {
-          flex: 1px;
+          flex: 1;
           text-align: center;
         }
       }
